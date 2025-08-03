@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>مشغل فيديو HLS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Plyr CSS -->
+  <link rel="stylesheet" href="https://cdn.plyr.io/3.7.2/plyr.css" />
+  <style>
+    body {
+      margin: 0;
+      background-color: #111;
+      color: #fff;
+      font-family: 'Almarai', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .player-container {
+      width: 90%;
+      max-width: 800px;
+    }
+  </style>
+</head>
+<body>
+  <div class="player-container">
+    <video id="player" controls playsinline></video>
+  </div>
+
+  <!-- HLS.js -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <!-- Plyr.js -->
+  <script src="https://cdn.plyr.io/3.7.2/plyr.polyfilled.js"></script>
+  <script>
+    const video = document.getElementById('player');
+    const videoSrc = 'https://servervip.sadshelpiq.workers.dev/proxy/vz-99e5c202-ca5.b-cdn.net/8f6f69a3-112b-4e4e-9d0b-a7aa2d3ff9e8/720p/video.m3u8';
+
+    const player = new Plyr(video, {
+      controls: [
+        'play-large', 'play', 'progress', 'current-time',
+        'mute', 'volume', 'settings', 'fullscreen'
+      ],
+      settings: ['captions', 'quality', 'speed'],
+      speed: { selected: 1, options: [0.5, 1, 1.25, 1.5, 2] }
+    });
+
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+      hls.loadSource(videoSrc);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play();
+      });
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = videoSrc;
+      video.addEventListener('loadedmetadata', () => {
+        video.play();
+      });
+    } else {
+      alert('هذا المتصفح لا يدعم تشغيل فيديو HLS');
+    }
+  </script>
+</body>
+</html>
